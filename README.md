@@ -3,6 +3,9 @@
 Project Url   
  [https://gitee.com/fallstar/AdminLTE-With-Iframe-Simple](https://gitee.com/fallstar/AdminLTE-With-Iframe-Simple)   
 
+[https://github.com/FallStar0/AdminLTE-With-Iframe-Simple](https://github.com/FallStar0/AdminLTE-With-Iframe-Simple)
+
+[Chinese Version](README.zh-cn.md)
 
 ## Instruction
 

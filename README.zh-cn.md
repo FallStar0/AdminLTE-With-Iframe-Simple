@@ -3,6 +3,9 @@
 本项目地址   
  [https://gitee.com/fallstar/AdminLTE-With-Iframe-Simple](https://gitee.com/fallstar/AdminLTE-With-Iframe-Simple)   
 
+[https://github.com/FallStar0/AdminLTE-With-Iframe-Simple](https://github.com/FallStar0/AdminLTE-With-Iframe-Simple)
+
+[English Version](README.md)
 
 ## 项目介绍
 
