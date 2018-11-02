@@ -1,22 +1,22 @@
 # AdminLTE-With-Iframe-Simple
 
-Project Url   
+本项目地址   
  [https://gitee.com/fallstar/AdminLTE-With-Iframe-Simple](https://gitee.com/fallstar/AdminLTE-With-Iframe-Simple)   
 
 
-## Instruction
+## 项目介绍
 
-The full version of the project comes from this project :
+项目完整版来源于这个项目：
 
 [https://gitee.com/weituotian/AdminLTE-With-Iframe](https://gitee.com/weituotian/AdminLTE-With-Iframe "AdminLTE-With-Iframe")
 
-This project has too many dependences ,so I had to make it simple to use.
+不过这个项目依赖项目太多了，所以我精简了一下。
 
-Only base framework from AdminLTE and tab manange with iframes.
+一个精简到只剩下外层框架的AdminLTE并使用多个标签内嵌iframe。
 
-Change skin function is still avalible.
+仅仅保留了外层框架，更换皮肤等功能。
 
-## Shot
+## 截图
 ![](./asset/Shot1.jpg)
 
 ![](./asset/Shot2.jpg)
