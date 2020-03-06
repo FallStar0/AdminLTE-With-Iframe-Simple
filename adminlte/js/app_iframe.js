@@ -1,4 +1,4 @@
-/**
+﻿/**
  Core script to handle the entire theme and core functions
  **/
 var App = function () {
@@ -13,7 +13,7 @@ var App = function () {
 
     var basePath = '../content/superui/';
 
-    var globalImgPath = 'global/img/';
+    var globalImgPath = 'adminlte/img/';
 
     var globalPluginsPath = 'base/plugins/';
 
