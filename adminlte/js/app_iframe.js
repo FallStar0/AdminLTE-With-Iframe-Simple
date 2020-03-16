@@ -1,4 +1,4 @@
-﻿/**
+/**
  Core script to handle the entire theme and core functions
  **/
 var App = function () {
@@ -10,16 +10,6 @@ var App = function () {
     var isIE10 = false;
 
     var resizeHandlers = [];
-
-    var basePath = '../content/superui/';
-
-    var globalImgPath = 'adminlte/img/';
-
-    var globalPluginsPath = 'base/plugins/';
-
-    var globalCssPath = 'global/css/';
-
-    // theme layout color set
 
     var brandColors = {
         'blue': '#89C4F4',
@@ -77,10 +67,6 @@ var App = function () {
             height: height,
             width: "100%"
         });
-
-        //var width = App.getViewPort().width- $(".page-sidebar-menu").width();
-        /*$(".tab_iframe").css({
-         });*/
     };
     //初始化内容页layout组件高度
     var handleIframeLayoutHeight = function () {
@@ -111,26 +97,9 @@ var App = function () {
             de.webkitRequestFullScreen();
         }
         else {
-            App.alert({message: "该浏览器不支持全屏！", type: "danger"});
+            App.alert({ message: "该浏览器不支持全屏！", type: "danger" });
         }
 
-    };
-
-    var requestFullScreen2 = function (element) {
-        // 判断各种浏览器，找到正确的方法
-        var requestMethod = element.requestFullScreen || //W3C
-            element.webkitRequestFullScreen ||    //Chrome等
-            element.mozRequestFullScreen || //FireFox
-            element.msRequestFullScreen; //IE11
-        if (requestMethod) {
-            requestMethod.call(element);
-        }
-        else if (typeof window.ActiveXObject !== "undefined") {//for Internet Explorer
-            var wscript = new ActiveXObject("WScript.Shell");
-            if (wscript !== null) {
-                wscript.SendKeys("{F11}");
-            }
-        }
     };
 
     //退出全屏 判断浏览器种类
@@ -182,250 +151,6 @@ var App = function () {
         }
     };
 
-    // Handles portlet tools & actions
-    var handlePortletTools = function () {
-        // handle portlet remove
-        $('body').on('click', '.portlet > .portlet-title > .tools > a.remove', function (e) {
-            e.preventDefault();
-            var portlet = $(this).closest(".portlet");
-
-            if ($('body').hasClass('page-portlet-fullscreen')) {
-                $('body').removeClass('page-portlet-fullscreen');
-            }
-
-            portlet.find('.portlet-title .fullscreen').tooltip('destroy');
-            portlet.find('.portlet-title > .tools > .reload').tooltip('destroy');
-            portlet.find('.portlet-title > .tools > .remove').tooltip('destroy');
-            portlet.find('.portlet-title > .tools > .config').tooltip('destroy');
-            portlet.find('.portlet-title > .tools > .collapse, .portlet > .portlet-title > .tools > .expand').tooltip('destroy');
-
-            portlet.remove();
-        });
-
-        // handle portlet fullscreen
-        $('body').on('click', '.portlet > .portlet-title .fullscreen', function (e) {
-            e.preventDefault();
-            var portlet = $(this).closest(".portlet");
-            if (portlet.hasClass('portlet-fullscreen')) {
-                $(this).removeClass('on');
-                portlet.removeClass('portlet-fullscreen');
-                $('body').removeClass('page-portlet-fullscreen');
-                portlet.children('.portlet-body').css('height', 'auto');
-            } else {
-                var height = App.getViewPort().height -
-                    portlet.children('.portlet-title').outerHeight() -
-                    parseInt(portlet.children('.portlet-body').css('padding-top')) -
-                    parseInt(portlet.children('.portlet-body').css('padding-bottom'));
-
-                $(this).addClass('on');
-                portlet.addClass('portlet-fullscreen');
-                $('body').addClass('page-portlet-fullscreen');
-                portlet.children('.portlet-body').css('height', height);
-            }
-        });
-
-        $('body').on('click', '.portlet > .portlet-title > .tools > a.reload', function (e) {
-            e.preventDefault();
-            var el = $(this).closest(".portlet").children(".portlet-body");
-            var url = $(this).attr("data-url");
-            var error = $(this).attr("data-error-display");
-            if (url) {
-                App.blockUI({
-                    target: el,
-                    animate: true,
-                    overlayColor: 'none'
-                });
-                $.ajax({
-                    type: "GET",
-                    cache: false,
-                    url: url,
-                    dataType: "html",
-                    success: function (res) {
-                        App.unblockUI(el);
-                        el.html(res);
-                        App.initAjax() // reinitialize elements & plugins for newly loaded content
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        App.unblockUI(el);
-                        var msg = 'Error on reloading the content. Please check your connection and try again.';
-                        if (error == "toastr" && toastr) {
-                            toastr.error(msg);
-                        } else if (error == "notific8" && $.notific8) {
-                            $.notific8('zindex', 11500);
-                            $.notific8(msg, {
-                                theme: 'ruby',
-                                life: 3000
-                            });
-                        } else {
-                            alert(msg);
-                        }
-                    }
-                });
-            } else {
-                // for demo purpose
-                App.blockUI({
-                    target: el,
-                    animate: true,
-                    overlayColor: 'none'
-                });
-                window.setTimeout(function () {
-                    App.unblockUI(el);
-                }, 1000);
-            }
-        });
-
-        // load ajax data on page init
-        $('.portlet .portlet-title a.reload[data-load="true"]').click();
-
-        $('body').on('click', '.portlet > .portlet-title > .tools > .collapse, .portlet .portlet-title > .tools > .expand', function (e) {
-            e.preventDefault();
-            var el = $(this).closest(".portlet").children(".portlet-body");
-            if ($(this).hasClass("collapse")) {
-                $(this).removeClass("collapse").addClass("expand");
-                el.slideUp(200);
-            } else {
-                $(this).removeClass("expand").addClass("collapse");
-                el.slideDown(200);
-            }
-        });
-    };
-
-    // Handles custom checkboxes & radios using jQuery Uniform plugin
-    var handleUniform = function () {
-        if (!$().uniform) {
-            return;
-        }
-        var test = $("input[type=checkbox]:not(.toggle, .md-check, .md-radiobtn, .make-switch, .icheck), input[type=radio]:not(.toggle, .md-check, .md-radiobtn, .star, .make-switch, .icheck)");
-        if (test.size() > 0) {
-            test.each(function () {
-                if ($(this).parents(".checker").size() === 0) {
-                    $(this).show();
-                    $(this).uniform();
-                }
-            });
-        }
-    };
-
-    // Handlesmaterial design checkboxes
-    var handleMaterialDesign = function () {
-
-        // Material design ckeckbox and radio effects
-        $('body').on('click', '.md-checkbox > label, .md-radio > label', function () {
-            var the = $(this);
-            // find the first span which is our circle/bubble
-            var el = $(this).children('span:first-child');
-
-            // add the bubble class (we do this so it doesnt show on page load)
-            el.addClass('inc');
-
-            // clone it
-            var newone = el.clone(true);
-
-            // add the cloned version before our original
-            el.before(newone);
-
-            // remove the original so that it is ready to run on next click
-            $("." + el.attr("class") + ":last", the).remove();
-        });
-
-        if ($('body').hasClass('page-md')) {
-            // Material design click effect
-            // credit where credit's due; http://thecodeplayer.com/walkthrough/ripple-click-effect-google-material-design       
-            var element, circle, d, x, y;
-            $('body').on('click', 'a.btn, button.btn, input.btn, label.btn', function (e) {
-                element = $(this);
-
-                if (element.find(".md-click-circle").length == 0) {
-                    element.prepend("<span class='md-click-circle'></span>");
-                }
-
-                circle = element.find(".md-click-circle");
-                circle.removeClass("md-click-animate");
-
-                if (!circle.height() && !circle.width()) {
-                    d = Math.max(element.outerWidth(), element.outerHeight());
-                    circle.css({height: d, width: d});
-                }
-
-                x = e.pageX - element.offset().left - circle.width() / 2;
-                y = e.pageY - element.offset().top - circle.height() / 2;
-
-                circle.css({top: y + 'px', left: x + 'px'}).addClass("md-click-animate");
-
-                setTimeout(function () {
-                    circle.remove();
-                }, 1000);
-            });
-        }
-
-        // Floating labels
-        var handleInput = function (el) {
-            if (el.val() != "") {
-                el.addClass('edited');
-            } else {
-                el.removeClass('edited');
-            }
-        }
-
-        $('body').on('keydown', '.form-md-floating-label .form-control', function (e) {
-            handleInput($(this));
-        });
-        $('body').on('blur', '.form-md-floating-label .form-control', function (e) {
-            handleInput($(this));
-        });
-
-        $('.form-md-floating-label .form-control').each(function () {
-            if ($(this).val().length > 0) {
-                $(this).addClass('edited');
-            }
-        });
-    };
-
-    // Handles custom checkboxes & radios using jQuery iCheck plugin
-    var handleiCheck = function () {
-        if (!$().iCheck) {
-            return;
-        }
-
-        $('.icheck').each(function () {
-            var checkboxClass = $(this).attr('data-checkbox') ? $(this).attr('data-checkbox') : 'icheckbox_minimal-grey';
-            var radioClass = $(this).attr('data-radio') ? $(this).attr('data-radio') : 'iradio_minimal-grey';
-
-            if (checkboxClass.indexOf('_line') > -1 || radioClass.indexOf('_line') > -1) {
-                $(this).iCheck({
-                    checkboxClass: checkboxClass,
-                    radioClass: radioClass,
-                    insert: '<div class="icheck_line-icon"></div>' + $(this).attr("data-label")
-                });
-            } else {
-                $(this).iCheck({
-                    checkboxClass: checkboxClass,
-                    radioClass: radioClass
-                });
-            }
-        });
-    };
-
-    // Handles Bootstrap switches
-    var handleBootstrapSwitch = function () {
-        if (!$().bootstrapSwitch) {
-            return;
-        }
-        $('.make-switch').bootstrapSwitch();
-    };
-
-    // Handles Bootstrap confirmations
-    var handleBootstrapConfirmation = function () {
-        if (!$().confirmation) {
-            return;
-        }
-        $('[data-toggle=confirmation]').confirmation({
-            container: 'body',
-            btnOkClass: 'btn btn-sm btn-success',
-            btnCancelClass: 'btn btn-sm btn-danger'
-        });
-    };
-
     // Handles Bootstrap Accordions.
     var handleAccordions = function () {
         $('body').on('shown.bs.collapse', '.accordion.scrollable', function (e) {
@@ -456,9 +181,9 @@ var App = function () {
     var handleModals = function () {
         // fix stackable modal issue: when 2 or more modals opened, closing one of modal will remove .modal-open class. 
         $('body').on('hide.bs.modal', function () {
-            if ($('.modal:visible').size() > 1 && $('html').hasClass('modal-open') === false) {
+            if ($('.modal:visible').length > 1 && $('html').hasClass('modal-open') === false) {
                 $('html').addClass('modal-open');
-            } else if ($('.modal:visible').size() <= 1) {
+            } else if ($('.modal:visible').length <= 1) {
                 $('html').removeClass('modal-open');
             }
         });
@@ -485,28 +210,6 @@ var App = function () {
     var handleTooltips = function () {
         // global tooltips
         $('.tooltips').tooltip();
-
-        // portlet tooltips
-        $('.portlet > .portlet-title .fullscreen').tooltip({
-            container: 'body',
-            title: 'Fullscreen'
-        });
-        $('.portlet > .portlet-title > .tools > .reload').tooltip({
-            container: 'body',
-            title: 'Reload'
-        });
-        $('.portlet > .portlet-title > .tools > .remove').tooltip({
-            container: 'body',
-            title: 'Remove'
-        });
-        $('.portlet > .portlet-title > .tools > .config').tooltip({
-            container: 'body',
-            title: 'Settings'
-        });
-        $('.portlet > .portlet-title > .tools > .collapse, .portlet > .portlet-title > .tools > .expand').tooltip({
-            container: 'body',
-            title: 'Collapse/Expand'
-        });
     };
 
     // Handles Bootstrap Dropdowns
@@ -537,74 +240,9 @@ var App = function () {
         });
     };
 
-    // Handle Hower Dropdowns
-    var handleDropdownHover = function () {
-        $('[data-hover="dropdown"]').not('.hover-initialized').each(function () {
-            $(this).dropdownHover();
-            $(this).addClass('hover-initialized');
-        });
-    };
-
-    // Handle textarea autosize 
-    var handleTextareaAutosize = function () {
-        if (typeof(autosize) == "function") {
-            autosize(document.querySelector('textarea.autosizeme'));
-        }
-    };
-
-    // Handles Bootstrap Popovers
-
-    // last popep popover
-    var lastPopedPopover;
-
-    var handlePopovers = function () {
-        $('.popovers').popover();
-
-        // close last displayed popover
-
-        $(document).on('click.bs.popover.data-api', function (e) {
-            if (lastPopedPopover) {
-                lastPopedPopover.popover('hide');
-            }
-        });
-    };
-
     // Handles scrollable contents using jQuery SlimScroll plugin.
     var handleScrollers = function () {
         App.initSlimScroll('.scroller');
-    };
-
-    // Handles Image Preview using jQuery Fancybox plugin
-    var handleFancybox = function () {
-        if (!jQuery.fancybox) {
-            return;
-        }
-
-        if ($(".fancybox-button").size() > 0) {
-            $(".fancybox-button").fancybox({
-                groupAttr: 'data-rel',
-                prevEffect: 'none',
-                nextEffect: 'none',
-                closeBtn: true,
-                helpers: {
-                    title: {
-                        type: 'inside'
-                    }
-                }
-            });
-        }
-    };
-
-    // Handles counterup plugin wrapper
-    var handleCounterup = function () {
-        if (!$().counterUp) {
-            return;
-        }
-
-        $("[data-counter='counterup']").counterUp({
-            delay: 10,
-            time: 1000
-        });
     };
 
     // Fix input placeholder issue for IE8 and IE9
@@ -672,6 +310,8 @@ var App = function () {
         });
     };
 
+    var lastPopedPopover;
+
     //* END:CORE HANDLERS *//
 
     return {
@@ -685,7 +325,7 @@ var App = function () {
             handleOnResize(); // set and handle responsive    
 
             //UI Component handlers     
-            handleMaterialDesign(); // handle material design       
+            //handleMaterialDesign(); // handle material design       
             //handleUniform(); // hanfle custom radio & checkboxes
             //handleiCheck(); // handles custom icheck radio and checkboxes
             //handleBootstrapSwitch(); // handle bootstrap switch plugin
@@ -699,9 +339,9 @@ var App = function () {
             //handlePopovers(); // handles bootstrap popovers
             handleAccordions(); //handles accordions 
             handleModals(); // handle modals
-            handleBootstrapConfirmation(); // handle bootstrap confirmations
+            //handleBootstrapConfirmation(); // handle bootstrap confirmations
             //handleTextareaAutosize(); // handle autosize textareas
-            handleCounterup(); // handle counterup instances
+            //handleCounterup(); // handle counterup instances
 
             handleSiderBarmenu();
             //Handle group element heights
@@ -723,7 +363,7 @@ var App = function () {
             handleTooltips(); // handle bootstrap tooltips
             //handlePopovers(); // handles bootstrap popovers
             handleAccordions(); //handles accordions 
-            handleBootstrapConfirmation(); // handle bootstrap confirmations
+            //handleBootstrapConfirmation(); // handle bootstrap confirmations
         },
         handleFullScreen: function () {
             if (isFullScreen) {
@@ -767,7 +407,7 @@ var App = function () {
 
         // wrApper function to scroll(focus) to an element
         scrollTo: function (el, offeset) {
-            var pos = (el && el.size() > 0) ? el.offset().top : 0;
+            var pos = (el && el.length > 0) ? el.offset().top : 0;
 
             if (el) {
                 if ($('body').hasClass('page-header-fixed')) {
@@ -863,71 +503,15 @@ var App = function () {
         },
 
         // wrApper function to  block element(indicate loading)
-        blockUI: function (options) {
-            options = $.extend(true, {}, options);
-            var html = '';
-            if (options.animate) {
-                html = '<div class="loading-message ' + (options.boxed ? 'loading-message-boxed' : '') + '">' + '<div class="block-spinner-bar"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>' + '</div>';
-            } else if (options.iconOnly) {
-                html = '<div class="loading-message ' + (options.boxed ? 'loading-message-boxed' : '') + '"><img src="' + this.getGlobalImgPath() + 'loading/loading-spinner-grey.gif" align=""></div>';
-            } else if (options.textOnly) {
-                html = '<div class="loading-message ' + (options.boxed ? 'loading-message-boxed' : '') + '"><span>&nbsp;&nbsp;' + (options.message ? options.message : 'LOADING...') + '</span></div>';
-            } else {
-                html = '<div class="loading-message ' + (options.boxed ? 'loading-message-boxed' : '') + '"><img src="' + this.getGlobalImgPath() + 'loading/loading-spinner-grey.gif" align=""><span>&nbsp;&nbsp;' + (options.message ? options.message : 'LOADING...') + '</span></div>';
-            }
-
-            if (options.target) { // element blocking
-                var el = $(options.target);
-                if (el.height() <= ($(window).height())) {
-                    options.cenrerY = true;
-                }
-                el.block({
-                    message: html,
-                    baseZ: options.zIndex ? options.zIndex : 1000,
-                    centerY: options.cenrerY !== undefined ? options.cenrerY : false,
-                    css: {
-                        top: '10%',
-                        border: '0',
-                        padding: '0',
-                        backgroundColor: 'none'
-                    },
-                    overlayCSS: {
-                        backgroundColor: options.overlayColor ? options.overlayColor : '#555',
-                        opacity: options.boxed ? 0.05 : 0.1,
-                        cursor: 'wait'
-                    }
-                });
-            } else { // page blocking
-                $.blockUI({
-                    message: html,
-                    baseZ: options.zIndex ? options.zIndex : 1000,
-                    css: {
-                        border: '0',
-                        padding: '0',
-                        backgroundColor: 'none'
-                    },
-                    overlayCSS: {
-                        backgroundColor: options.overlayColor ? options.overlayColor : '#555',
-                        opacity: options.boxed ? 0.05 : 0.1,
-                        cursor: 'wait'
-                    }
-                });
-            }
+        blockUI: function (autoCloseTimeout) {
+            $('#loadingModal').show();
+            if (autoCloseTimeout && autoCloseTimeout > 0)
+                setTimeout(App.unblockUI, autoCloseTimeout);
         },
 
         // wrApper function to  un-block element(finish loading)
-        unblockUI: function (target) {
-            if (target) {
-                $(target).unblock({
-                    onUnblock: function () {
-                        $(target).css('position', '');
-                        $(target).css('zoom', '');
-
-                    }
-                });
-            } else {
-                $.unblockUI();
-            }
+        unblockUI: function () {
+            $('#loadingModal').hide();
         },
 
         startPageLoading: function (options) {
@@ -967,12 +551,12 @@ var App = function () {
             }
 
             if (!options.container) {
-                if ($('.page-fixed-main-content').size() === 1) {
+                if ($('.page-fixed-main-content').length === 1) {
                     $('.page-fixed-main-content').prepend(html);
-                } else if (($('body').hasClass("page-container-bg-solid") || $('body').hasClass("page-content-white")) && $('.page-head').size() === 0) {
+                } else if (($('body').hasClass("page-container-bg-solid") || $('body').hasClass("page-content-white")) && $('.page-head').length === 0) {
                     $('.page-title').after(html);
                 } else {
-                    if ($('.page-bar').size() > 0) {
+                    if ($('.page-bar').length > 0) {
                         $('.page-bar').after(html);
                     } else {
                         $('.page-breadcrumb, .breadcrumbs').after(html);
@@ -997,30 +581,6 @@ var App = function () {
             }
 
             return id;
-        },
-
-        // initializes uniform elements
-        initUniform: function (els) {
-            if (els) {
-                $(els).each(function () {
-                    if ($(this).parents(".checker").size() === 0) {
-                        $(this).show();
-                        $(this).uniform();
-                    }
-                });
-            } else {
-                handleUniform();
-            }
-        },
-
-        //wrApper function to update/sync jquery uniform checkbox & radios
-        updateUniform: function (els) {
-            $.uniform.update(els); // update the uniform checkbox & radios UI after the actual input control state changed
-        },
-
-        //public function to initialize the fancybox plugin
-        initFancybox: function () {
-            handleFancybox();
         },
 
         //public helper function to get actual input value(used in IE9 and IE8 due to placeholder attribute not supported)
@@ -1090,39 +650,6 @@ var App = function () {
             return isRTL;
         },
 
-        // check IE8 mode
-        isAngularJsApp: function () {
-            return (typeof angular == 'undefined') ? false : true;
-        },
-
-        getbasePath: function () {
-            return basePath;
-        },
-
-        setbasePath: function (path) {
-            basePath = path;
-        },
-
-        setGlobalImgPath: function (path) {
-            globalImgPath = path;
-        },
-
-        getGlobalImgPath: function () {
-            return basePath + globalImgPath;
-        },
-
-        setGlobalPluginsPath: function (path) {
-            globalPluginsPath = path;
-        },
-
-        getGlobalPluginsPath: function () {
-            return basePath + globalPluginsPath;
-        },
-
-        getGlobalCssPath: function () {
-            return basePath + globalCssPath;
-        },
-
         // get layout color code by color name
         getBrandColor: function (name) {
             if (brandColors[name]) {
@@ -1177,7 +704,7 @@ context = (function () {
 
         $(document).on('click', function () {
             $('.dropdown-context').fadeOut(options.fadeSpeed, function () {
-                $('.dropdown-context').css({display: ''}).find('.drop-left').removeClass('drop-left');
+                $('.dropdown-context').css({ display: '' }).find('.drop-left').removeClass('drop-left');
             });
         });
         if (options.preventDoubleContext) {
@@ -1256,7 +783,7 @@ context = (function () {
                     element += (addDynamicTag) ? ' class="dynamic-menu-item"' : '';
                     element += '><a tabindex="-1" href="' + data[i].href + '"' + linkTarget + '>';
                     if (typeof data[i].icon !== 'undefined')
-                        element += '<span class="glyphicon ' + data[i].icon + '"></span> ';
+                        element += '<span class="' + data[i].icon + '"></span> ';
                     element += data[i].text + '</a></li>';
                     $sub = $(element);
                 }
@@ -1365,7 +892,7 @@ context = (function () {
 
 var createCallback = function (func) {
     return function (event) {
-        func(event, currentContextSelector,rightClickEvent)
+        func(event, currentContextSelector, rightClickEvent)
     };
 };
 
@@ -1417,7 +944,7 @@ function getActivePageId() {
 }
 
 function canRemoveTab(pageId) {
-    return findTabTitle(pageId).find('.fa-remove').size() > 0;
+    return findTabTitle(pageId).find('.page_tab_close').length > 0;
 }
 
 //添加tab
@@ -1426,12 +953,13 @@ var addTabs = function (options) {
         id: Math.random() * 200,
         urlType: "relative",
         title: "新页面",
-        targetType: "iframe-tab"
+        targetType: "iframe-tab",
+        close: true,
     };
 
     options = $.extend(true, defaultTabOptions, options);
 
-    if (options.urlType === "relative") {
+    if (options.urlType === "relative" && options.url.substr(0, 1) != '/') {
         // var url = window.location.protocol + '//' + window.location.host + "/";
         var basePath = window.location.pathname + "/../";
         options.url = basePath + options.url;
@@ -1439,8 +967,23 @@ var addTabs = function (options) {
 
     var pageId = options.id;
 
+    var p = findTabPanel(pageId);
+    //如果已经存在
+    if (p) {
+        var url = p.attr('data-tab-url');
+        if (url !== options.url) {
+            var frame = p.find('iframe');
+            if (frame) {
+                frame.attr('src', options.url);
+            }
+            p.attr('data-tab-url', options.url);
+        }
+        activeTabByPageId(pageId);
+        return;
+    }
+
     //判断这个id的tab是否已经存在,不存在就新建一个
-    if (findTabPanel(pageId) === null) {
+    if (p === null) {
 
         //创建新TAB的title
         // title = '<a  id="tab_' + pageId + '"  data-id="' + pageId + '"  class="menu_tab" >';
@@ -1464,28 +1007,31 @@ var addTabs = function (options) {
 
 
         var $tabPanel = $('<div role="tabpanel" class="tab-pane"></div>').attr(pageIdField, pageId);
+        $tabPanel.attr('data-tab-url', options.url);
 
         if (options.content) {
             //是否指定TAB内容
             $tabPanel.append(options.content);
         } else {
             //没有内容，使用IFRAME打开链接
-
-            App.blockUI({
-                target: '#tab-content',
-                boxed: true,
-                message: '加载中......'//,
-                // animate: true
-            });
+            App.blockUI(3000);
+            //App.blockUI({
+            //    target: '#tab-content',
+            //    boxed: true,
+            //    message: '加载中......'//,
+            //    // animate: true
+            //});
 
             var $iframe = $("<iframe></iframe>").attr("src", options.url).css("width", "100%").attr("frameborder", "no").attr("id", "iframe_" + pageId).addClass("tab_iframe").attr(pageIdField, pageId);
             //frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes"  allowtransparency="yes"
 
             //iframe 加载完成事件
-            $iframe.load(function () {
-                App.unblockUI('#tab-content');//解锁界面
+            $iframe.on('load', function () {
+                App.unblockUI();
+                //App.unblockUI('#tab-content');//解锁界面
                 App.fixIframeCotent();//修正高度
             });
+
 
             $tabPanel.append($iframe);
 
@@ -1523,7 +1069,7 @@ function closeTabByPageId(pageId) {
         //优先传递给后面的tab,没有的话就传递给前一个
         var $nextTitle = $title.next();
         var activePageId;
-        if ($nextTitle.size() > 0) {
+        if ($nextTitle.length > 0) {
             activePageId = getPageId($nextTitle);
         } else {
             activePageId = getPageId($title.prev());
@@ -1570,12 +1116,12 @@ function refreshTabById(pageId) {
         $iframe[0].contentWindow.location.reload(true);//带参数刷新
     }
 
-    App.blockUI({
-        target: '#tab-content',
-        boxed: true,
-        message: '加载中......'//,
-        // animate: true
-    });
+    //App.blockUI({
+    //    target: '#tab-content',
+    //    boxed: true,
+    //    message: '加载中......'//,
+    //    // animate: true
+    //});
 }
 
 var refreshTab = function () {
@@ -1782,9 +1328,9 @@ $(function () {
         compress: true//元素更少的padding
     });
     context.attach('.page-tabs-content', [
-//            {header: 'Options'},
+        //            {header: 'Options'},
         {
-            text: '<i class="mi mi-refresh"></i>刷新 (双击标签)',
+            text: '<i class="fa fa-refresh"></i>刷新 (双击标签)',
             action: function (e, $selector, rightClickEvent) {
                 //e是点击菜单的事件
                 //$selector就是＄（".page-tabs-content")
@@ -1795,7 +1341,7 @@ $(function () {
             }
         },
         {
-            text: '<i class="mi mi-cross"></i>关闭',
+            text: '<i class="fa fa-cross"></i>关闭',
             action: function (e, $selector, rightClickEvent) {
                 var pageId = getPageId(findTabElement(rightClickEvent.target));
                 closeTabByPageId(pageId);
@@ -1811,17 +1357,23 @@ $(function () {
 
         //    }
         //}
-//            {text: 'Open in new Window', href: '#'},
-//            {divider: true},
-//            {text: 'Copy', href: '#'},
-//            {text: 'Dafuq!?', href: '#'}
+        //            {text: 'Open in new Window', href: '#'},
+        //            {divider: true},
+        //            {text: 'Copy', href: '#'},
+        //            {text: 'Dafuq!?', href: '#'}
     ]);
 
 });
 
 (function ($) {
-    $.fn.sidebarMenu = function (options) {
+    $.fn.sidebarMenu = function (options, defaultOption) {
         options = $.extend({}, $.fn.sidebarMenu.defaults, options || {});
+
+        defaultOption = $.extend({}, {
+            targetType: "iframe-tab",
+            icon: "fa fa-circle-o"
+        }, defaultOption || {});
+
         var $menu_ul = $(this);
         var level = 0;
         //  target.addClass('nav');
@@ -1860,7 +1412,7 @@ $(function () {
 
                 //图标
                 var $icon = $('<i></i>');
-                $icon.addClass(item.icon);
+                $icon.addClass(item.icon || defaultOption.icon);
 
                 //标题
                 var $title = $('<span class="title"></span>');
@@ -1894,30 +1446,36 @@ $(function () {
                     li.append(menus);
                 }
                 else {
+                    switch (item.targetType) {
+                        case "blank": //代表打开新页面
+                            {
+                                $a.attr("href", item.url);
+                                $a.attr("target", "_blank");
+                            }
+                            break;
+                        case "ajax": //代表ajax方式打开页面
+                            {
+                                $a.attr("href", item.url);
+                                $a.addClass("ajaxify");
+                            }
+                            break;
+                        case "iframe"://代表单iframe页面
+                            {
+                                $a.attr("href", item.url);
+                                $a.addClass("iframeOpen");
+                                $("#iframe-main").addClass("tab_iframe");
+                            }
+                            break;
+                        case "iframe-tab"://新tab标签
+                        default:
+                            {
+                                item.urlType = item.urlType ? item.urlType : 'relative';
+                                var href = 'addTabs({id:\'' + item.id + '\',title: \'' + item.text + '\',close: true,url: \'' + item.url + '\',urlType: \'' + item.urlType + '\'});';
+                                $a.attr('onclick', href);
+                            }
+                            break;
+                    }
 
-                    if (item.targetType != null && item.targetType === "blank") //代表打开新页面
-                    {
-                        $a.attr("href", item.url);
-                        $a.attr("target", "_blank");
-                    }
-                    else if (item.targetType != null && item.targetType === "ajax") { //代表ajax方式打开页面
-                        $a.attr("href", item.url);
-                        $a.addClass("ajaxify");
-                    }
-                    else if (item.targetType != null && item.targetType === "iframe-tab") {
-                        item.urlType = item.urlType ? item.urlType : 'relative';
-                        var href = 'addTabs({id:\'' + item.id + '\',title: \'' + item.text + '\',close: true,url: \'' + item.url + '\',urlType: \'' + item.urlType + '\'});';
-                        $a.attr('onclick', href);
-                    }
-                    else if (item.targetType != null && item.targetType === "iframe") { //代表单iframe页面
-                        $a.attr("href", item.url);
-                        $a.addClass("iframeOpen");
-                        $("#iframe-main").addClass("tab_iframe");
-                    } else {
-                        $a.attr("href", item.url);
-                        $a.addClass("iframeOpen");
-                        $("#iframe-main").addClass("tab_iframe");
-                    }
                     $a.addClass("nav-link");
                     var badge = $("<span></span>");
                     // <span class="badge badge-success">1</span>
@@ -1935,7 +1493,7 @@ $(function () {
         $menu_ul.on("click", "li.treeview a", function () {
             var $a = $(this);
 
-            if ($a.next().size() == 0) {//如果size>0,就认为它是可以展开的
+            if ($a.next().length == 0) {//如果size>0,就认为它是可以展开的
                 if ($(window).width() < $.AdminLTE.options.screenSizes.sm) {//小屏幕
                     //触发左边菜单栏按钮点击事件,关闭菜单栏
                     $($.AdminLTE.options.sidebarToggleSelector).click();
