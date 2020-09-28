@@ -7,6 +7,8 @@ Project Url
 
 [Chinese Version](README.zh-cn.md)
 
+For the user who don't want to use complex fontend project or lack of time or peaple.
+
 ## Instruction
 
 The full version of the project comes from this project :
@@ -18,6 +20,24 @@ This project has too many dependences ,so I had to make it simple to use.
 Only base framework from AdminLTE and tab manange with iframes.
 
 Change skin function is still avalible.
+
+## Features
+
++ Build the menus by passing an tree structure config model.
++ Menu kind support: virtual , external , internal ,etc
++ Multi tabs support
+
+## Scense
+
+The background project using ***ASP.NET*** or ***ASP.NET Core*** , import this sample assets,
+pass the menu configs to the page and bind.
+
+Then the framework is done.
+
+The other functions can develop in seperate form.
+
+The best partner of this project : vue.js , bootstrap , jQuery , Layer
+
 
 ## Shot
 ![](./asset/Shot1.jpg)
