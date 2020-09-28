@@ -169,7 +169,7 @@
                 <!-- search form -->
                 <form action="#" method="get" class="sidebar-form">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search...">
+                        <input type="text" name="q" class="form-control" autocomplete="off" placeholder="Search...">
                         <span class="input-group-btn">
                             <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_menu()">
                                 <i class="fa fa-search"></i>
@@ -466,10 +466,6 @@
 
         $(function () {
             //        console.log(window.location);
-
-            App.setbasePath("../");
-            App.setGlobalImgPath("dist/img/");
-
             // addTabs({
             //     id: '10008',
             //     title: '欢迎页',
